@@ -51,7 +51,7 @@ typedef enum {
 } UARTChannel;
 
 typedef struct {
-    bool is_nsfw; // TODO: replace with packs text support
+    /* bool is_nsfw; */ // TODO: replace with packs text support
 
     char asset_pack[XTREME_ASSETS_PACK_NAME_LEN];
     uint32_t anim_speed;

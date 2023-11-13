@@ -11,14 +11,13 @@ void power_settings_scene_power_off_on_enter(void* context) {
     PowerSettingsApp* app = context;
     DialogEx* dialog = app->dialog;
 
-    dialog_ex_set_header(dialog, "Turn Off Device?", 64, 2, AlignCenter, AlignTop);
-    if(xtreme_settings.is_nsfw) {
-        dialog_ex_set_text(
-            dialog, "   I will be\nwaiting for\n you master", 78, 16, AlignLeft, AlignTop);
-    } else {
-        dialog_ex_set_text(
-            dialog, "   I will be\nwaiting for\n you here", 78, 16, AlignLeft, AlignTop);
-    }
+    dialog_ex_set_header(dialog, "Shutdown the Flipper?", 64, 2, AlignCenter, AlignTop);
+    //if(xtreme_settings()->is_nsfw) {
+    //    dialog_ex_set_text(
+    //        dialog, "   I will be\nwaiting for\n you master", 78, 16, AlignLeft, AlignTop);
+    //} else {
+    dialog_ex_set_text(dialog, "   I will\nmiss you\n Leeroy...", 78, 16, AlignLeft, AlignTop);
+    //}
     dialog_ex_set_icon(dialog, 21, 13, &I_Cry_dolph_55x52);
     dialog_ex_set_left_button_text(dialog, "Battery");
     dialog_ex_set_right_button_text(dialog, "OFF");
@@ -34,6 +33,11 @@ bool power_settings_scene_power_off_on_event(void* context, SceneManagerEvent ev
 
     if(event.type == SceneManagerEventTypeCustom) {
         if(event.event == DialogExResultLeft) {
+            //Back to Desktop, user didnt do shutdown.
+            //XFW Have removed for their version.
+            scene_manager_previous_scene(app->scene_manager);
+
+            //Now show the battery scene!
             scene_manager_next_scene(app->scene_manager, PowerSettingsAppSceneBatteryInfo);
         } else if(event.event == DialogExResultRight) {
             power_off(app->power);

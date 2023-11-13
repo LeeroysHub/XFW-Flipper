@@ -103,7 +103,7 @@ static void flipper_boot_status(Canvas* canvas, const char* text) {
     canvas_reset(canvas);
     canvas_draw_str_aligned(canvas, 64, 40, AlignCenter, AlignCenter, text);
     canvas_set_font(canvas, FontPrimary);
-    canvas_draw_str_aligned(canvas, 64, 24, AlignCenter, AlignCenter, "Xtreme is Booting");
+    canvas_draw_str_aligned(canvas, 64, 24, AlignCenter, AlignCenter, "This is Leeroy's Flipper!");
     canvas_commit(canvas);
 }
 

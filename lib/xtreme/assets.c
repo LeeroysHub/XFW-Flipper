@@ -103,7 +103,7 @@ void free_icon(const Icon* icon) {
 
 void XTREME_ASSETS_LOAD() {
     const char* pack = xtreme_settings.asset_pack;
-    xtreme_settings.is_nsfw = !strncmp(pack, "NSFW", strlen("NSFW"));
+    //xtreme_settings()->is_nsfw = !strncmp(pack, "NSFW", strlen("NSFW"));
     if(pack[0] == '\0') return;
 
     Storage* storage = furi_record_open(RECORD_STORAGE);
