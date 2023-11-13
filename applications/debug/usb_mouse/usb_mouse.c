@@ -55,6 +55,7 @@ int32_t usb_mouse_app(void* p) {
     gui_add_view_port(gui, view_port, GuiLayerFullscreen);
 
     UsbMouseEvent event;
+    uint8_t acceleration = 0;
     while(1) {
         FuriStatus event_status = furi_message_queue_get(event_queue, &event, FuriWaitForever);
 
@@ -63,6 +64,16 @@ int32_t usb_mouse_app(void* p) {
                 if(event.input.type == InputTypeLong && event.input.key == InputKeyBack) {
                     break;
                 }
+
+                /*  Jump Size = 5px
+                ONE JUMP 1st 5 repeats
+                2xJUMP acceleration thereafter (10px)
+                MAX speed 100px                                 */
+                acceleration = (event.input.type == InputTypePress)   ? 0 :
+                               (event.input.type == InputTypeRelease) ? 0 :
+                               (acceleration < 5)                     ? acceleration + 1 :
+                               (acceleration > 17)                    ? 20 :
+                                                                        acceleration + 2;
 
                 if(event.input.type == InputTypeShort && event.input.key == InputKeyBack) {
                     furi_hal_hid_mouse_press(HID_MOUSE_BTN_RIGHT);
@@ -81,7 +92,9 @@ int32_t usb_mouse_app(void* p) {
                     if(event.input.type == InputTypePress) {
                         furi_hal_hid_mouse_move(MOUSE_MOVE_SHORT, 0);
                     } else if(event.input.type == InputTypeRepeat) {
-                        furi_hal_hid_mouse_move(MOUSE_MOVE_LONG, 0);
+                        for(uint8_t i = 0; i < acceleration; i++) {
+                            furi_hal_hid_mouse_move(MOUSE_MOVE_SHORT, 0);
+                        }
                     }
                 }
 
@@ -89,7 +102,9 @@ int32_t usb_mouse_app(void* p) {
                     if(event.input.type == InputTypePress) {
                         furi_hal_hid_mouse_move(-MOUSE_MOVE_SHORT, 0);
                     } else if(event.input.type == InputTypeRepeat) {
-                        furi_hal_hid_mouse_move(-MOUSE_MOVE_LONG, 0);
+                        for(uint8_t i = 0; i < acceleration; i++) {
+                            furi_hal_hid_mouse_move(-MOUSE_MOVE_SHORT, 0);
+                        }
                     }
                 }
 
@@ -97,7 +112,9 @@ int32_t usb_mouse_app(void* p) {
                     if(event.input.type == InputTypePress) {
                         furi_hal_hid_mouse_move(0, MOUSE_MOVE_SHORT);
                     } else if(event.input.type == InputTypeRepeat) {
-                        furi_hal_hid_mouse_move(0, MOUSE_MOVE_LONG);
+                        for(uint8_t i = 0; i < acceleration; i++) {
+                            furi_hal_hid_mouse_move(0, MOUSE_MOVE_SHORT);
+                        }
                     }
                 }
 
@@ -105,7 +122,9 @@ int32_t usb_mouse_app(void* p) {
                     if(event.input.type == InputTypePress) {
                         furi_hal_hid_mouse_move(0, -MOUSE_MOVE_SHORT);
                     } else if(event.input.type == InputTypeRepeat) {
-                        furi_hal_hid_mouse_move(0, -MOUSE_MOVE_LONG);
+                        for(uint8_t i = 0; i < acceleration; i++) {
+                            furi_hal_hid_mouse_move(0, -MOUSE_MOVE_SHORT);
+                        }
                     }
                 }
             }
