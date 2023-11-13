@@ -50,6 +50,7 @@ static const uint32_t subghz_frequency_list[] = {
     433657070,
     433889000,
     433920000 | FREQUENCY_FLAG_DEFAULT, /* LPD433 mid */
+    434040000,
     434075000,
     434176948,
     434190000,
