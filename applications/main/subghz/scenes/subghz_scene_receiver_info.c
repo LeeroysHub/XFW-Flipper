@@ -126,10 +126,15 @@ void subghz_scene_receiver_info_on_enter(void* context) {
     subghz_custom_btns_reset();
 
     subghz_scene_receiver_info_draw_widget(subghz);
-
-    if(!subghz_history_get_text_space_left(subghz->history, NULL, 0)) {
-        subghz->state_notifications = SubGhzNotificationStateRx;
-    }
+    
+     /* This does not work. The receiving does not happen, and they know it.
+        So, why do we turn on the notification that we receive?
+        THe user thinks its receiving, dont matter if SubGHZ is technically on.
+        if(!subghz_history_get_text_space_left(subghz->history, NULL, 0)) {
+            subghz->state_notifications = SubGhzNotificationStateRx;
+        }
+    */
+    subghz->state_notifications = SubGhzNotificationStateIDLE;
 }
 
 bool subghz_scene_receiver_info_on_event(void* context, SceneManagerEvent event) {
@@ -146,7 +151,7 @@ bool subghz_scene_receiver_info_on_event(void* context, SceneManagerEvent event)
                    subghz_history_get_raw_data(subghz->history, subghz->idx_menu_chosen))) {
                 subghz_txrx_rx_start(subghz->txrx);
                 subghz_txrx_hopper_unpause(subghz->txrx);
-                subghz->state_notifications = SubGhzNotificationStateRx;
+                subghz->state_notifications = SubGhzNotificationStateIDLE;
             } else {
                 subghz->state_notifications = SubGhzNotificationStateTx;
             }
@@ -164,7 +169,7 @@ bool subghz_scene_receiver_info_on_event(void* context, SceneManagerEvent event)
 
                 subghz_txrx_hopper_unpause(subghz->txrx);
                 if(!subghz_history_get_text_space_left(subghz->history, NULL, 0)) {
-                    subghz->state_notifications = SubGhzNotificationStateRx;
+                    subghz->state_notifications = SubGhzNotificationStateIDLE;
                 }
             }
             return true;
@@ -227,4 +232,7 @@ void subghz_scene_receiver_info_on_exit(void* context) {
 
     widget_reset(subghz->widget);
     subghz_txrx_reset_dynamic_and_custom_btns(subghz->txrx);
+    
+    /* Hacky fix, but this is whats happening for the user! */
+    subghz->state_notifications = SubGhzNotificationStateRx;
 }
