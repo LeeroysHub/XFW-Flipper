@@ -68,3 +68,6 @@ PVS-Studio.log
 .gdbinit
 
 /fbt_options_local.py
+
+#No Readme in my private repo.
+ReadMe.md
