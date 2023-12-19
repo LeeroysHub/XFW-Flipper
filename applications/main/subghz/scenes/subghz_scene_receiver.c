@@ -375,7 +375,7 @@ bool subghz_scene_receiver_on_event(void* context, SceneManagerEvent event) {
             }
 
             //Te * Bits gives us the total key TX time.
-            uint32_t key_tx_length = tmpTe * tmpBits / 1000;
+            uint32_t key_tx_length = tmpTe * (tmpBits + 1) / 1000;
 
             if(!subghz_tx_start(subghz, key_repeat_data)) {
                 view_dispatcher_send_custom_event(
@@ -384,12 +384,13 @@ bool subghz_scene_receiver_on_event(void* context, SceneManagerEvent event) {
                 subghz->state_notifications = SubGhzNotificationStateTx;
                 notification_message(subghz->notifications, &subghz_sequence_tx_beep);
 
-                uint32_t repeatnormal = (key_tx_length > 1000) ? 1 : 3;
+                uint32_t repeatnormal = (key_tx_length > 1000) ? 1 : 5;
                 uint32_t repeat_time = ((subghz->repeater & SubGhzRepeaterStateOnLong) != 0) ?
                                            2 * repeatnormal * key_tx_length :
                                        ((subghz->repeater & SubGhzRepeaterStateOnShort) != 0) ?
-                                           1 * key_tx_length :
+                                           2 * key_tx_length :
                                            repeatnormal * key_tx_length;
+
                 furi_timer_start(subghz->timer, repeat_time);
             }
             subghz_rx_key_state_set(subghz, SubGhzRxKeyStateTX);
