@@ -364,25 +364,32 @@ bool subghz_scene_receiver_on_event(void* context, SceneManagerEvent event) {
                 subghz->history, subghz_history_get_last_index(subghz->history) - 1);
 
             uint32_t tmpTe = 300;
+            uint32_t tmpBits = 1000;
+
             if(!flipper_format_rewind(key_repeat_data)) {
                 FURI_LOG_E(TAG, "Rewind error");
+            } else if(!flipper_format_read_uint32(key_repeat_data, "Bit", (uint32_t*)&tmpBits, 1)) {
+                FURI_LOG_E(TAG, "Missing Bit");
             } else if(!flipper_format_read_uint32(key_repeat_data, "TE", (uint32_t*)&tmpTe, 1)) {
                 FURI_LOG_E(TAG, "Missing TE");
             }
 
-            if(subghz_txrx_tx_start(subghz->txrx, key_repeat_data) != SubGhzTxRxStartTxStateOk) {
+            //Te * Bits gives us the total key TX time.
+            uint32_t key_tx_length = tmpTe * tmpBits / 1000;
+
+            if(!subghz_tx_start(subghz, key_repeat_data)) {
                 view_dispatcher_send_custom_event(
                     subghz->view_dispatcher, SubGhzCustomEventViewRepeaterStop);
             } else {
                 subghz->state_notifications = SubGhzNotificationStateTx;
                 notification_message(subghz->notifications, &subghz_sequence_tx_beep);
 
-                uint32_t repeatnormal = (tmpTe > 1000) ? 1 : 3;
+                uint32_t repeatnormal = (key_tx_length > 1000) ? 1 : 3;
                 uint32_t repeat_time = ((subghz->repeater & SubGhzRepeaterStateOnLong) != 0) ?
-                                           2 * repeatnormal * tmpTe :
+                                           2 * repeatnormal * key_tx_length :
                                        ((subghz->repeater & SubGhzRepeaterStateOnShort) != 0) ?
-                                           1 * tmpTe :
-                                           repeatnormal * tmpTe;
+                                           1 * key_tx_length :
+                                           repeatnormal * key_tx_length;
                 furi_timer_start(subghz->timer, repeat_time);
             }
             subghz_rx_key_state_set(subghz, SubGhzRxKeyStateTX);
